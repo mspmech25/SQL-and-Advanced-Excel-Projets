@@ -1,0 +1,118 @@
+create database weather_observation;
+use weather_observation;
+
+create table station
+(id int,
+city varchar(200),
+state varchar(200),
+lat_n int,
+long_w int
+);
+
+desc station;
+
+/*Q.2*/
+/* insert data into the table*/
+insert into station(id,city,state,lat_n,long_w )
+values(13, "Phoenix", "AZ", 33 ,112),
+(44 ,"Denver", "CO", 40 ,105),
+(66,"Caribou", "ME", 47, 68);
+
+/*Q.3*/
+/* Execute a query to look at table STATION in undefined order*/
+select * from station;
+
+
+/*Q.4*/
+/*Execute a query to select Northern stations (Northern latitude > 39.7).*/
+select * from station
+where lat_n>39.7;
+
+
+/*Q.5*/
+/*Create another table, ‘STATS’, to store normalized temperature and precipitation data*/
+
+create table stats
+(id int,
+month int,
+temp_f int,
+rain_i int);
+
+/*Q.6 */
+/* populate the data in stat*/
+insert into stats
+values(13, 1, 57.4 ,0.31),
+(13, 7 ,91.7, 5.15),
+(44, 1 ,27.3 ,0.18),
+(44, 7 ,74.8 ,2.11),
+(66, 1 ,6.7 ,2.1),
+(66, 7 ,65.8 ,4.52);
+
+select * from stats;
+
+/*Q.7*/
+/*Execute a query to display temperature stats (from STATS table) for each city (from Station
+table).*/
+select s.id,s.city,s1.temp_f
+from station as s
+inner join stats as s1
+on s.id=s1.id;
+
+/*Q.8*/
+/*Execute a query to look at the table STATS, ordered by month and greatest rainfall, with
+columns rearranged. It should also show the corresponding cities*/
+
+select s.city,s1.temp_f,s1.month
+from station as s
+inner join stats as s1
+on s.id=s1.id
+order by month and rain_i desc;
+
+/* Q.9*/
+/*Execute a query to look at temperatures for July from table STATS, lowest temperatures first,
+picking up city name and latitude*/
+
+select s.city,s1.temp_f,s1.month,s.lat_n
+from station as s
+inner join stats as s1
+on s.id=s1.id
+where month=7
+order by temp_f,city,lat_n asc;
+
+/*Q.10*/
+/*Execute a query to show MAX and MIN temperatures as well as average rainfall for each city*/
+
+select s.city,s1.temp_f,max(temp_f),min(temp_f),avg(rain_i) as avgrain
+from station as s
+inner join stats as s1
+on s.id=s1.id
+group by city
+order by city;
+
+/*Q.11*/
+/* Execute a query to display each city’s monthly temperature in Celcius and rainfall in
+Centimeter*/
+
+select s.id,s.city,(temp_f-32)*5/9,s1.month,rain_i*2.5
+from station as s
+inner join stats as s1
+on s.id=s1.id;
+
+
+
+
+
+/*Q.12*/
+/*Update all rows of table STATS to compensate for faulty rain gauges known to read 0.01
+inches low*/
+update stats
+set rain_i=rain_i+0.01;
+
+
+/*Q.13*/
+/*Update Denver's July temperature reading as 74.9*/
+update stats
+set temp_f=74.9
+where id=44 and month=7;
+
+select * from stats;
